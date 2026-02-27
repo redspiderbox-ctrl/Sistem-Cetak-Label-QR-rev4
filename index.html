@@ -83,15 +83,13 @@ header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(
         flex-direction: column;
     }
     
-    /* Jadikan body flex container untuk menarik scanner ke atas */
     body {
         display: flex;
         flex-direction: column;
     }
 
-    /* Container scanner mobile */
     #reader-container {
-        order: -1; /* Pindahkan ke paling atas sebelum header pun jika perlu, tapi di sini di bawah header */
+        order: -1; 
         position: sticky;
         top: 0;
         z-index: 100;
@@ -101,16 +99,8 @@ header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(
         border-radius: 0;
     }
 
-    header {
-        /* Header tetap di atas, scanner di bawah header */
-        order: 0; 
-    }
-    
-    .container {
-        order: 1;
-        padding: 15px;
-    }
-
+    header { order: 0; }
+    .container { order: 1; padding: 15px; }
     header h2 { font-size: 1rem; }
     .controls { grid-template-columns: 1fr; }
 }
@@ -195,7 +185,6 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
     position: relative;
 }
 
-/* Mobile: Full width tanpa border radius */
 @media (max-width: 768px) {
     #reader {
         border-radius: 0;
@@ -203,7 +192,6 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
     }
 }
 
-/* Garis Laser */
 .scanner-line {
     position: absolute;
     top: 50%;
@@ -237,14 +225,14 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
 
 <body>
 
-<!-- Container untuk Scanner (akan dipindahkan posisinya via CSS di mobile) -->
+<!-- Container untuk Scanner -->
 <div id="reader-container">
     <div id="reader"></div>
 </div>
 
 <header>
     <h2>📦 Stock Opname</h2>
-    <span>v3.1 Mobile Pro</span>
+    <span>v3.2 Auto Add</span>
 </header>
 
 <div class="main-content-wrapper">
@@ -411,8 +399,11 @@ function filterTable() {
     });
 
     if(visibleCount === 1 && lastVisibleRow) {
-        lastVisibleRow.classList.add("found-highlight");
-        lastVisibleRow.querySelector("input").focus();
+        // Jangan auto focus saat scan mode aktif, agar tidak mengganggu
+        if(!isScanning) {
+            lastVisibleRow.classList.add("found-highlight");
+            lastVisibleRow.querySelector("input").focus();
+        }
     }
 }
 
@@ -423,10 +414,8 @@ function toggleScan(){
         return;
     }
     
-    // Tampilkan container scanner
     readerContainer.style.display = "block";
     
-    // Tambahkan Garis Laser
     if(!document.getElementById("scan-line-overlay")) {
         const line = document.createElement("div");
         line.id = "scan-line-overlay";
@@ -436,12 +425,11 @@ function toggleScan(){
 
     html5QrCode = new Html5Qrcode("reader");
     
-    // Konfigurasi Sensitivitas Tinggi
     const config = { 
-        fps: 60, // Frame rate tinggi
+        fps: 60, 
         qrbox: function(viewfinderWidth, viewfinderHeight) {
             let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
-            let qrboxSize = Math.floor(minEdge * 0.7); // 70% ukuran viewfinder
+            let qrboxSize = Math.floor(minEdge * 0.7);
             return { width: qrboxSize, height: qrboxSize };
         },
         aspectRatio: 1.0
@@ -458,7 +446,6 @@ function toggleScan(){
         btn.innerText = "❌ Stop";
         btn.classList.add("active");
         
-        // Scroll ke atas saat mode mobile
         if(window.innerWidth <= 768) {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -475,19 +462,41 @@ function onScanSuccess(decodedText) {
         beepSound.play();
     } catch(e){ console.log("Audio blocked"); }
 
-    document.getElementById("search").value = decodedText;
+    // Isi search box & filter
+    const searchInput = document.getElementById("search");
+    searchInput.value = decodedText;
+    
+    // Filter tabel berdasarkan hasil scan
     filterTable();
     
+    // Logika Penambahan Otomatis (+1)
     const visibleRows = [...tbody.querySelectorAll("tr")].filter(r => r.style.display !== "none");
     
     if(visibleRows.length === 1){
-        stopScan();
-        visibleRows[0].classList.add("found-highlight");
-        visibleRows[0].querySelector("input").focus();
-        showToast("✅ Sukses!");
-        if(navigator.vibrate) navigator.vibrate(200);
+        // Ketemu 1 baris -> Tambah 1
+        const row = visibleRows[0];
+        const inputFisik = row.querySelector("input");
+        
+        // Tambah nilai
+        let currentVal = parseInt(inputFisik.value) || 0;
+        inputFisik.value = currentVal + 1;
+        
+        // Trigger kalkulasi
+        calc(inputFisik);
+        
+        // Visual Feedback
+        row.classList.remove("found-highlight");
+        void row.offsetWidth; // trigger reflow
+        row.classList.add("found-highlight");
+        
+        showToast(`✅ ${decodedText} (+1)`);
+        if(navigator.vibrate) navigator.vibrate(100);
+        
+        // TIDAK STOP SCAN -> Bisa scan lagi
+    } else if(visibleRows.length > 1) {
+        showToast(`⚠️ Ketemu ${visibleRows.length} part (Double?)`);
     } else {
-        showToast(`⚠️ Ketemu ${visibleRows.length} part`);
+        showToast(`❌ Part ${decodedText} tidak ada`);
     }
 }
 
