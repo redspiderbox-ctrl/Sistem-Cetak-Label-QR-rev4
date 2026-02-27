@@ -69,25 +69,16 @@ header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(
     flex-grow: 1;
 }
 
-/* Default: Scanner di dalam card (posisi normal) */
 #reader-container {
     display: none;
     margin-bottom: 15px;
     position: relative;
 }
 
-/* Mobile Specific: Pindahkan Scanner ke paling atas */
+/* Mobile Specific: Scanner Top */
 @media (max-width: 768px) {
-    .main-content-wrapper {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    body {
-        display: flex;
-        flex-direction: column;
-    }
-
+    .main-content-wrapper { display: flex; flex-direction: column; }
+    body { display: flex; flex-direction: column; }
     #reader-container {
         order: -1; 
         position: sticky;
@@ -98,7 +89,6 @@ header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(
         margin: 0;
         border-radius: 0;
     }
-
     header { order: 0; }
     .container { order: 1; padding: 15px; }
     header h2 { font-size: 1rem; }
@@ -205,6 +195,12 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
     animation: laserMove 1.5s infinite linear;
 }
 
+/* Animation Pause saat Cooldown */
+.scanner-line.paused {
+    animation-play-state: paused;
+    opacity: 0;
+}
+
 @keyframes laserMove {
     0% { top: 20%; opacity: 0.5; }
     50% { top: 80%; opacity: 1; }
@@ -232,7 +228,7 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
 
 <header>
     <h2>📦 Stock Opname</h2>
-    <span>v3.2 Auto Add</span>
+    <span>v3.3 Delay 1s</span>
 </header>
 
 <div class="main-content-wrapper">
@@ -299,7 +295,7 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
 <div id="toast">Notifikasi</div>
 
 <!-- Audio Beep Base64 -->
-<audio id="successSound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ej35qYF9lc4GKkJSPiIV9dG1wdn6Gj5SVkIuFfHRvcXaBh46VkI2Jgnx0cXd9hYyTkomHgXx1c3h+g4qRjoqGgHx2dnh/hYmPioeEfnd2eX6EioyJhoN/eHZ4foOIi4mGgn98eHl9goiKiIWBf3x4eX2Bh4qHhIB/fHp6foGGioaDf356e3uAhImHgn9+e3x+gISJhYJ/fXt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhQ=="></audio>
+<audio id="successSound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ej35qYF9lc4GKkJSPiIV9dG1wdn6Gj5SVkIuFfHRvcXaBh46VkI2Jgnx0cXd9hYyTkomHgXx1c3h+g4qRjoqGgHx2dnh/hYmPioeEfnd2eX6EioyJhoN/eHZ4foOIi4mGgn98eHl9goiKiIWBf3x4eX2Bh4qHhIB/fHp6foGGioaDf356e3uAhImHgn9+e3x+gISJhYJ/fXt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhQ=="></audio>
 
 <script>
 const tbody = document.getElementById("tbody");
@@ -308,6 +304,9 @@ const readerContainer = document.getElementById("reader-container");
 let html5QrCode = null;
 let isScanning = false;
 const beepSound = document.getElementById("successSound");
+
+// Variabel untuk Cooldown / Jeda
+let isProcessing = false; 
 
 /* ===== INIT ===== */
 window.onload = () => {
@@ -381,30 +380,13 @@ function calc(input) {
 /* ===== SEARCH & FILTER ===== */
 function filterTable() {
     const keyword = document.getElementById("search").value.toLowerCase();
-    let visibleCount = 0;
-    let lastVisibleRow = null;
-
     tbody.querySelectorAll("tr").forEach(r => {
         const part = r.cells[1].innerText.toLowerCase();
         const desc = r.cells[2].innerText.toLowerCase();
         const isMatch = part.includes(keyword) || desc.includes(keyword);
-        
         r.style.display = isMatch ? "" : "none";
         r.classList.remove("found-highlight");
-        
-        if(isMatch && keyword.length > 0){
-            visibleCount++;
-            lastVisibleRow = r;
-        }
     });
-
-    if(visibleCount === 1 && lastVisibleRow) {
-        // Jangan auto focus saat scan mode aktif, agar tidak mengganggu
-        if(!isScanning) {
-            lastVisibleRow.classList.add("found-highlight");
-            lastVisibleRow.querySelector("input").focus();
-        }
-    }
 }
 
 /* ===== BARCODE SCANNING ===== */
@@ -456,48 +438,55 @@ function toggleScan(){
 }
 
 function onScanSuccess(decodedText) {
+    // CEK JEDA (COOLDOWN)
+    if(isProcessing) return; // Jika masih dalam masa jeda, abaikan scan
+
     // Mainkan Suara
     try {
         beepSound.currentTime = 0;
         beepSound.play();
     } catch(e){ console.log("Audio blocked"); }
 
-    // Isi search box & filter
+    // Aktifkan status jeda
+    isProcessing = true;
+    
+    // Visual Feedback on Scanner Line (Pause Animation)
+    const line = document.getElementById("scan-line-overlay");
+    if(line) line.classList.add("paused");
+
+    // Proses Data
     const searchInput = document.getElementById("search");
     searchInput.value = decodedText;
-    
-    // Filter tabel berdasarkan hasil scan
     filterTable();
     
-    // Logika Penambahan Otomatis (+1)
     const visibleRows = [...tbody.querySelectorAll("tr")].filter(r => r.style.display !== "none");
     
     if(visibleRows.length === 1){
-        // Ketemu 1 baris -> Tambah 1
         const row = visibleRows[0];
         const inputFisik = row.querySelector("input");
         
-        // Tambah nilai
         let currentVal = parseInt(inputFisik.value) || 0;
         inputFisik.value = currentVal + 1;
         
-        // Trigger kalkulasi
         calc(inputFisik);
         
-        // Visual Feedback
         row.classList.remove("found-highlight");
-        void row.offsetWidth; // trigger reflow
+        void row.offsetWidth; 
         row.classList.add("found-highlight");
         
         showToast(`✅ ${decodedText} (+1)`);
         if(navigator.vibrate) navigator.vibrate(100);
-        
-        // TIDAK STOP SCAN -> Bisa scan lagi
     } else if(visibleRows.length > 1) {
-        showToast(`⚠️ Ketemu ${visibleRows.length} part (Double?)`);
+        showToast(`⚠️ Ketemu ${visibleRows.length} part`);
     } else {
-        showToast(`❌ Part ${decodedText} tidak ada`);
+        showToast(`❌ Part tidak ada`);
     }
+
+    // TIMER JEDA 1 DETIK
+    setTimeout(() => {
+        isProcessing = false;
+        if(line) line.classList.remove("paused");
+    }, 1000);
 }
 
 function onScanFailure(error) { }
@@ -513,6 +502,7 @@ function stopScan() {
             btn.innerText = "📷 Scan";
             btn.classList.remove("active");
             isScanning = false;
+            isProcessing = false; // Reset status
         }).catch(err => console.error(err));
     }
 }
