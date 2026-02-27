@@ -31,6 +31,8 @@ body {
     background: var(--bg);
     color: var(--text-dark);
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* HEADER */
@@ -42,20 +44,75 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: relative; /* Agar z-index berlaku */
+    flex-shrink: 0;
     z-index: 10;
 }
-header h2 { margin: 0; letter-spacing: 0.5px; font-weight: 700; display:flex; align-items:center; gap:10px; font-size: 18px; }
+header h2 { margin: 0; letter-spacing: 0.5px; font-weight: 700; display:flex; align-items:center; gap:10px; font-size: 1.2rem; }
 header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px; }
 
-/* CONTAINER */
-.container { padding: 20px; max-width: 1400px; margin: 0 auto; }
+/* MAIN CONTAINER */
+.container { padding: 20px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
 .card {
     background: var(--card);
     border-radius: 20px;
     padding: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.04);
     border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+/* FLEX ORDER MAGIC FOR MOBILE */
+.main-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Default: Scanner di dalam card (posisi normal) */
+#reader-container {
+    display: none;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+/* Mobile Specific: Pindahkan Scanner ke paling atas */
+@media (max-width: 768px) {
+    .main-content-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Jadikan body flex container untuk menarik scanner ke atas */
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Container scanner mobile */
+    #reader-container {
+        order: -1; /* Pindahkan ke paling atas sebelum header pun jika perlu, tapi di sini di bawah header */
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #000;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    header {
+        /* Header tetap di atas, scanner di bawah header */
+        order: 0; 
+    }
+    
+    .container {
+        order: 1;
+        padding: 15px;
+    }
+
+    header h2 { font-size: 1rem; }
+    .controls { grid-template-columns: 1fr; }
 }
 
 /* CONTROLS AREA */
@@ -63,10 +120,10 @@ header span { font-size: 12px; opacity: 0.9; font-weight: 400; background: rgba(
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 .input-group { display: flex; flex-direction: column; gap: 6px; }
-.label { font-size: 12px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+.label { font-size: 11px; font-weight: 600; color: var(--text-gray); text-transform: uppercase; letter-spacing: 0.5px; }
 
 input[type="text"], input[type="date"], input[type="number"], input[type="file"] {
     padding: 12px 16px;
@@ -75,6 +132,8 @@ input[type="text"], input[type="date"], input[type="number"], input[type="file"]
     font-size: 14px;
     transition: all 0.2s;
     background: #FAFAFA;
+    width: 100%;
+    box-sizing: border-box;
 }
 input:focus {
     border-color: var(--primary);
@@ -99,24 +158,21 @@ input:focus {
 }
 
 .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2); }
-.btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
-
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
 .btn-success { background: var(--success); color: #fff; }
 .btn-success:hover { background: #15803d; }
-
 .btn-danger { background: transparent; color: var(--danger); border: 2px solid var(--border); }
 .btn-danger:hover { background: #FEF2F2; border-color: var(--danger); }
-
 .btn-action { background: #F3F4F6; color: var(--text-dark); border: 1px solid var(--border); }
 .btn-action:hover { background: #E5E7EB; }
-
 .btn-scan { background: var(--text-dark); color: #fff; }
+.btn-scan.active { background: var(--danger); }
 
 /* TABLE */
-.table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; margin-top: 10px; }
+.table-wrapper { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; margin-top: 5px; }
 table { width: 100%; border-collapse: collapse; min-width: 800px; }
-th { background: #F9FAFB; padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; border-bottom: 2px solid var(--border); }
-td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; background: #fff; }
+th { background: #F9FAFB; padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--text-gray); text-transform: uppercase; border-bottom: 2px solid var(--border); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 14px; background: #fff; }
 tr:nth-child(even) td { background: #F9FAFB; }
 tr:hover td { background: #FEF2F2; }
 
@@ -124,47 +180,30 @@ tr:hover td { background: #FEF2F2; }
 .qty-system { font-family: 'Courier New', monospace; font-weight: 600; }
 input[type="number"] { width: 80px; text-align: center; font-weight: 600; padding: 8px; border-radius: 6px; }
 
-/* Selisih Badges */
+/* Badges */
 .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-block; min-width: 40px; text-align: center; }
 .badge.plus { background: #DCFCE7; color: var(--success); }
 .badge.minus { background: #FEE2E2; color: var(--danger); }
 .badge.zero { background: #F3F4F6; color: var(--neutral); }
 
-/* SCANNER FLOATING TOP LAYOUT */
-#scanner-container {
-    position: fixed; /* Melayang di atas semua */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9); /* Background gelap transparan */
-    z-index: 9999; /* Paling atas */
-    display: none; /* Tersembunyi default */
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Konten di atas */
-    padding-top: 20px;
-}
-
-.scanner-header {
-    color: white;
-    font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 16px;
-    text-align: center;
-}
-
+/* SCANNER STYLING */
 #reader {
-    width: 90%;
-    max-width: 300px; /* Ukuran kamera kecil & fokus */
-    border-radius: 15px;
+    width: 100%;
+    border: none;
     overflow: hidden;
+    background: #000;
     position: relative;
-    box-shadow: 0 0 30px rgba(220, 38, 38, 0.3);
-    border: 3px solid var(--primary);
 }
 
-/* Garis Sensor Laser */
+/* Mobile: Full width tanpa border radius */
+@media (max-width: 768px) {
+    #reader {
+        border-radius: 0;
+        border-bottom: 4px solid var(--text-dark);
+    }
+}
+
+/* Garis Laser */
 .scanner-line {
     position: absolute;
     top: 50%;
@@ -179,123 +218,105 @@ input[type="number"] { width: 80px; text-align: center; font-weight: 600; paddin
 }
 
 @keyframes laserMove {
-    0% { top: 10%; opacity: 0.5; }
-    50% { top: 90%; opacity: 1; }
-    100% { top: 10%; opacity: 0.5; }
-}
-
-.close-scanner-btn {
-    margin-top: 20px;
-    padding: 12px 40px;
-    background: var(--danger);
-    color: white;
-    border: none;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    0% { top: 20%; opacity: 0.5; }
+    50% { top: 80%; opacity: 1; }
+    100% { top: 20%; opacity: 0.5; }
 }
 
 /* FOOTER ACTIONS */
-.footer-actions { margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.footer-actions { margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
 
 /* TOAST */
-#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 500; box-shadow: 0 10px 20px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 99999; }
+#toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--text-dark); color: #fff; padding: 12px 24px; border-radius: 50px; font-weight: 500; box-shadow: 0 10px 20px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 9999; }
 #toast.show { opacity: 1; transform: translateX(-50%) translateY(-10px); }
 
 .found-highlight { animation: highlightFade 2s; }
 @keyframes highlightFade { 0% { background-color: #FEF2F2; } 100% { background-color: transparent; } }
-
-@media (max-width: 768px) { 
-    .container { padding: 10px; } 
-    .card { padding: 10px; }
-    header { padding: 15px; }
-    .btn { padding: 10px 14px; font-size: 13px; }
-}
 </style>
 </head>
 
 <body>
 
-<header>
-    <h2>📦 Stock Opname</h2>
-    <span>v3.1 Float Scan</span>
-</header>
-
-<div class="container">
-    <div class="card">
-        
-        <div class="controls">
-            <div class="input-group">
-                <span class="label">Tanggal Opname</span>
-                <input type="date" id="tanggal">
-            </div>
-            
-            <div class="input-group">
-                <span class="label">Import Data</span>
-                <input type="file" id="fileInput" accept=".xlsx,.xls" style="background:none; padding:10px;">
-            </div>
-            
-             <div class="input-group" style="justify-content: flex-end;">
-                <span class="label">&nbsp;</span>
-                <button class="btn btn-success" onclick="manualSave()">💾 Simpan Data</button>
-            </div>
-        </div>
-
-        <div class="controls">
-            <div class="input-group" style="grid-column: span 2;">
-                <span class="label">Pencarian</span>
-                <input type="text" id="search" placeholder="Ketik Part Number atau Nama Barang..." oninput="filterTable()">
-            </div>
-            
-            <div class="input-group" style="justify-content: flex-end;">
-                <span class="label">&nbsp;</span>
-                <div style="display:flex; gap:10px;">
-                    <button id="btnScan" class="btn btn-scan" onclick="toggleScan()">📷 Scan</button>
-                    <button class="btn btn-danger" onclick="clearAll()">🗑 Hapus</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width:50px">NO</th>
-                        <th>PART</th>
-                        <th>Deskripsi Part</th>
-                        <th style="width:100px">QTY</th>
-                        <th style="width:100px">QTY FISIK</th>
-                        <th style="width:100px">SELISIH</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-        </div>
-
-        <div class="footer-actions">
-            <button class="btn btn-action" onclick="exportExcel()">⬇ Excel</button>
-            <button class="btn btn-primary" onclick="exportPDF()">⬇ PDF</button>
-        </div>
-
-    </div>
+<!-- Container untuk Scanner (akan dipindahkan posisinya via CSS di mobile) -->
+<div id="reader-container">
+    <div id="reader"></div>
 </div>
 
-<!-- Area Kamera Floating (Tersembunyi default) -->
-<div id="scanner-container">
-    <div class="scanner-header">Arahkan Barcode ke Kotak</div>
-    <div id="reader"></div>
-    <button class="close-scanner-btn" onclick="stopScan()">TUTUP KAMERA</button>
+<header>
+    <h2>📦 Stock Opname</h2>
+    <span>v3.1 Mobile Pro</span>
+</header>
+
+<div class="main-content-wrapper">
+    <div class="container">
+        <div class="card">
+            
+            <div class="controls">
+                <div class="input-group">
+                    <span class="label">Tanggal</span>
+                    <input type="date" id="tanggal">
+                </div>
+                
+                <div class="input-group">
+                    <span class="label">Import Excel</span>
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" style="background:none; padding:9px;">
+                </div>
+                
+                 <div class="input-group" style="justify-content: flex-end;">
+                    <span class="label">&nbsp;</span>
+                    <button class="btn btn-success" onclick="manualSave()">💾 Simpan</button>
+                </div>
+            </div>
+
+            <div class="controls">
+                <div class="input-group" style="grid-column: span 2;">
+                    <span class="label">Pencarian</span>
+                    <input type="text" id="search" placeholder="Ketik Part Number..." oninput="filterTable()">
+                </div>
+                
+                <div class="input-group" style="justify-content: flex-end;">
+                    <span class="label">&nbsp;</span>
+                    <div style="display:flex; gap:10px;">
+                        <button id="btnScan" class="btn btn-scan" onclick="toggleScan()">📷 Scan</button>
+                        <button class="btn btn-danger" onclick="clearAll()">🗑 Hapus</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:50px">NO</th>
+                            <th>PART</th>
+                            <th>Deskripsi Part</th>
+                            <th style="width:80px">QTY</th>
+                            <th style="width:100px">QTY FISIK</th>
+                            <th style="width:80px">SELISIH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+
+            <div class="footer-actions">
+                <button class="btn btn-action" onclick="exportExcel()">⬇ Excel</button>
+                <button class="btn btn-primary" onclick="exportPDF()">⬇ PDF</button>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 <div id="toast">Notifikasi</div>
 
 <!-- Audio Beep Base64 -->
-<audio id="successSound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ej35qYF9lc4GKkJSPiIV9dG1wdn6Gj5SVkIuFfHRvcXaBh46VkI2Jgnx0cXd9hYyTkomHgXx1c3h+g4qRjoqGgHx2dnh/hYmPioeEfnd2eX6EioyJhoN/eHZ4foOIi4mGgn98eHl9goiKiIWBf3x4eX2Bh4qHhIB/fHp6foGGioaDf356e3uAhImHgn9+e3x+gISJhYJ/fXt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhQ=="></audio>
+<audio id="successSound" src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2Onp+ej35qYF9lc4GKkJSPiIV9dG1wdn6Gj5SVkIuFfHRvcXaBh46VkI2Jgnx0cXd9hYyTkomHgXx1c3h+g4qRjoqGgHx2dnh/hYmPioeEfnd2eX6EioyJhoN/eHZ4foOIi4mGgn98eHl9goiKiIWBf3x4eX2Bh4qHhIB/fHp6foGGioaDf356e3uAhImHgn9+e3x+gISJhYJ/fXt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhYJ/fHt8foCEiIWCf3x7fH6AhIiFgn98e3x+gISIhQ=="></audio>
 
 <script>
 const tbody = document.getElementById("tbody");
 const storageKey = "opnameDataModern";
+const readerContainer = document.getElementById("reader-container");
 let html5QrCode = null;
 let isScanning = false;
 const beepSound = document.getElementById("successSound");
@@ -331,7 +352,7 @@ document.getElementById("fileInput").addEventListener("change", e => {
             saveStorage();
             showToast(`✅ ${count} item dimuat`);
         } catch (err) {
-            showToast("❌ Gagal membaca file Excel");
+            showToast("❌ Gagal membaca file");
             console.error(err);
         }
     };
@@ -395,19 +416,17 @@ function filterTable() {
     }
 }
 
-/* ===== BARCODE SCANNING FLOATING ===== */
+/* ===== BARCODE SCANNING ===== */
 function toggleScan(){
-    if(isScanning) return;
+    if(isScanning) {
+        stopScan();
+        return;
+    }
     
-    // Tampilkan Container Floating
-    const container = document.getElementById("scanner-container");
-    container.style.display = "flex";
-    
-    // Inisialisasi Scanner
-    html5QrCode = new Html5Qrcode("reader");
+    // Tampilkan container scanner
+    readerContainer.style.display = "block";
     
     // Tambahkan Garis Laser
-    // Pastikan tidak ada garis duplikat
     if(!document.getElementById("scan-line-overlay")) {
         const line = document.createElement("div");
         line.id = "scan-line-overlay";
@@ -415,9 +434,17 @@ function toggleScan(){
         document.getElementById("reader").appendChild(line);
     }
 
+    html5QrCode = new Html5Qrcode("reader");
+    
+    // Konfigurasi Sensitivitas Tinggi
     const config = { 
-        fps: 60, 
-        qrbox: { width: 250, height: 150 }
+        fps: 60, // Frame rate tinggi
+        qrbox: function(viewfinderWidth, viewfinderHeight) {
+            let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+            let qrboxSize = Math.floor(minEdge * 0.7); // 70% ukuran viewfinder
+            return { width: qrboxSize, height: qrboxSize };
+        },
+        aspectRatio: 1.0
     };
     
     html5QrCode.start(
@@ -427,9 +454,17 @@ function toggleScan(){
         onScanFailure
     ).then(() => {
         isScanning = true;
+        const btn = document.getElementById("btnScan");
+        btn.innerText = "❌ Stop";
+        btn.classList.add("active");
+        
+        // Scroll ke atas saat mode mobile
+        if(window.innerWidth <= 768) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     }).catch(err => {
-        showToast("❌ Kamera gagal diakses");
-        stopScan(); // Tutup jika gagal
+        showToast("❌ Kamera gagal");
+        readerContainer.style.display = "none";
     });
 }
 
@@ -446,10 +481,10 @@ function onScanSuccess(decodedText) {
     const visibleRows = [...tbody.querySelectorAll("tr")].filter(r => r.style.display !== "none");
     
     if(visibleRows.length === 1){
-        stopScan(); // Auto stop jika ketemu
+        stopScan();
         visibleRows[0].classList.add("found-highlight");
         visibleRows[0].querySelector("input").focus();
-        showToast("✅ Berhasil!");
+        showToast("✅ Sukses!");
         if(navigator.vibrate) navigator.vibrate(200);
     } else {
         showToast(`⚠️ Ketemu ${visibleRows.length} part`);
@@ -459,24 +494,17 @@ function onScanSuccess(decodedText) {
 function onScanFailure(error) { }
 
 function stopScan() {
-    // Sembunyikan Container Floating
-    const container = document.getElementById("scanner-container");
-    
     if(html5QrCode && isScanning) {
         html5QrCode.stop().then(() => {
-            // Hapus garis laser
+            readerContainer.style.display = "none";
             const line = document.getElementById("scan-line-overlay");
             if(line) line.remove();
             
-            container.style.display = "none";
+            const btn = document.getElementById("btnScan");
+            btn.innerText = "📷 Scan";
+            btn.classList.remove("active");
             isScanning = false;
-        }).catch(err => {
-            console.error(err);
-            container.style.display = "none";
-            isScanning = false;
-        });
-    } else {
-        container.style.display = "none";
+        }).catch(err => console.error(err));
     }
 }
 
